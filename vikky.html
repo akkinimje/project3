@@ -1,0 +1,131 @@
+HOW TO INSTALL MAGENTO ENVIRONMENT
+
+
+Magento Environment Creation
+Magento comes in two flavours:
+
+1)Open Source
+2)Commerce
+
+To install Magento, we need to follow these steps: Create the virtual host environment on the respective server. 
+
+*Login to SSH and stay outside public_html. 
+
+step 1 (for magento 2.4.5)
+*To install Magento Open Source, use the following composer command: 
+composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition public_html
+
+*To install Magento Commerce, use the following composer command: 
+composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition public_html
+
+                ********************************************(OR)**************************************
+NOTE:when we need to install magento 2.4.4 then using this command.
+
+*To install Magento Open Source, use the following composer command: 
+composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=2.4.4 public_html
+
+*To install Magento Commerce, use the following composer command: 
+composer create-project --repository-url=https://repo.magento.com/ magento/project-enterprise-edition=2.4.4 public_html
+
+step:2
+NOTE:the user id & password is only need when we create main instance(server) if we installating sub-server so there is not need to user ID & password in sub server from that user.so skip the step-2.
+
+This will ask for authentication. Use the following values:
+User: 5be721829782cab5ab5f358283cce348
+Pass: e3c319f62e2140eb6ac0998897de2244
+
+step:3(NOTE:this command is run in sub-server public_html..LIKE..ex:akashn@morag:~/domains/abn.akashn.morag.dotcomweavers.net/public_html$)
+Now once the composer create project is completed, we need to set the file permissions. To do this run the following commands by going INSIDE PUBLIC_HTML:
+
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
+
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+
+chmod u+x bin/magento
+
+step:4 (NOTE: if sample data required than follow this step otherwise not.)
+Sample Data: 
+If sample data is required to be installed, then you need to execute the following command. This might also ask for authentication, so use the same keys as above.
+
+php 7.4 /bin/magento sampledata:deploy
+
+step:5
+Now we need to run the Magento install command via command line 
+The index prefix for elasticsearch must always be the virtualhostname_servername. For e.g. m24com_asgard or tcc_titan and so on. 
+If you are installing Magento 2.4 then Elasticsearch 7 is required. 
+Please make sure the admin username is NOT "admin". It is not secure.
+MAIN COMMAND
+php7.4 bin/magento setup:install --base-url=https://virtualhostURL  --db-host=localhost --db-name=dbName --db-user=dbUser --db-password=dbPassword  --admin-firstname=FirstName --admin-lastname=LastName --admin-email=youremail  --admin-user=username --admin-password=password --search-engine=elasticsearch7 --elasticsearch-host=elastic7.dotcomweavers.net --elasticsearch-port=9200 --elasticsearch-index-prefix=virtualhost_servername
+
+EDITED COMMAND(NOTE:its shows where you need to edit in main command)
+php7.4 bin/magento setup:install --base-url=https://nimje.akashn.morag.dotcomweavers.net  --db-host=localhost --db-name=nimje --db-user=akashn --db-password=Dotcom@123  --admin-firstname=FirstName --admin-lastname=LastName --admin-email=akashn@dotcomweavers.com  --admin-user=akashn --admin-password=Dotcom@123 --search-engine=elasticsearch7 --elasticsearch-host=elastic7.dotcomweavers.net --elasticsearch-port=9200 --elasticsearch-index-prefix=akash_asgard
+step:6
+After installing, we need to make sure to edit .htaccess file in 2 places(SymlinksIfOwnerMatch):
+1)
+public_html/pub/.htaccess
+2)
+public_html/pub/media/.htaccess
+
+step:7(NOTE:if user need b2b extension than follow this step otherwise not)
+MAGENTO B2B INSTALLATION
+composer update
+composer require magento/extension-b2b
+php bin/magento module:status
+php bin/magento module:enable --all
+php bin/magento setup:upgrade
+php bin/magento s:d:c
+php bin/magento c:f
+
+step:8 if we need to disable Magento_TwoFactorAuth than run below command
+
+php7.4 bin/magento module:disable Magento_TwoFactorAuth
+
+step:9 after installation if site is not working properly so its need to cache clean, upgrade at that time run below command:
+
+1)php7.4 bin/magento cache:flush 
+2)php7.4 bin/magento setup:upgrade 
+3)php7.4 bin/magento setup:di:compile 
+4)php7.4 bin/magento setup:static-content:deploy
+
+NOTE:when some time after installation site is work properly but, internal option is not working properly ex. search option, men , woman, giftcard etc. in LUMA and its showing
+"No input file specified" at that time check- webmin/service configuration/website option and change PHP mode was set to php-fcgi
+ to php-fpm mode.
+  
+
+The editing is required to replace the Options FollowSymlinks with Options +SymlinksIfOwnerMatch. Without making this edit, the media/css/static files may not show up on front end. 
+Magento 2.4 requires 2-Factor authentication. Google Authenticator is available and you can use your company email which is linked with your admin user. So when the user logs in first time, you will receive a link for setting up Auth. 
+--------------------------------------------------------------------------------------------------------completd successfully---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+AFTER COMPLETE INSTALLATION WE NEED TO MAIL USER SOME INFORMATION IN SPECIFIC FORMAT IN TICKETING TOOL FOLLOWING AS BELOW:
+HI, username(ex;akash n)
+
+
+hi name,
+subject:
+
+Webmin Access:
+https://akashn.morag.dotcomweavers.net:10000
+User Name: akashn
+Password: Dotcom@123
+Domain name:https://akashn.morag.dotcomweavers.net/
+Domain Path : /home/akashn/public_html
+SSH details
+SSH : ssh akashn@morag.dotcomweavers.net
+Password: Dotcom@123
+Database details
+DB Access: https://akashn.morag.dotcomweavers.net/pma/index.php......(first confrim the db access path is correct or not)
+Db user: akashn
+DB name: akashn
+Password: Dotcom@123
+Admin detail
+https://akashn.morag.dotcomweavers.net/admin_9m8fdf........(admin_9m8fdf....check env file(path:/public_html/app/etc)
+user: akashn
+Password: Dotcom@123
+
+phpmyadmin
+morag.dotcomweavers.net/pma
+user:akashn
+password:Dotcom@123
+
+
+
